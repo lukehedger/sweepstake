@@ -1,0 +1,23 @@
+{
+  "name": "sweepstake",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukehedger/sweepstake.git"
+  },
+  "keywords": [],
+  "author": "Luke Hedger (https://www.level-out.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lukehedger/sweepstake/issues"
+  },
+  "homepage": "https://github.com/lukehedger/sweepstake#readme",
+  "dependencies": {
+    "random-int": "^1.0.0"
+  }
+}
