@@ -1,16 +1,13 @@
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
 const el_button = document.getElementById('button')
 const el_player = document.getElementById('player')
 const el_team = document.getElementById('team')
 
 const DRAW = {}
-
+// const DRAW_MAX_TIME = 1000
+const DRAW_MAX_TIME = 2000
 const MAX_TEAMS = 4
 
-const PLAYERS = [
+const POT_PLAYERS = [
   {
     name: "Dan",
     teams: 0,
@@ -45,7 +42,7 @@ const PLAYERS = [
   },
 ]
 
-const TEAMS = [
+const POT_TEAMS = [
   {
     name: "Egypt",
     group: "A"
@@ -180,72 +177,108 @@ const TEAMS = [
   },
 ]
 
-let playerIndex = randomInt(0, PLAYERS.length - 1)
-let teamIndex
-
-// TEMP
-let count = 0
-
-function step(ts) {
-  // TODO - Just do this over a certain amount of time (say, ~3s)
-  if (count < 32) {
-    count += 1
-
-    teamIndex = randomInt(0, TEAMS.length - 1)
-
-    el_team.innerHTML =  TEAMS[teamIndex].name
-
-    return window.requestAnimationFrame(step)
-  } else {
-    DRAW[TEAMS[teamIndex].name] = PLAYERS[playerIndex].name
-
-    // TODO - Render the PLAYER against the TEAM
-    document.getElementById(TEAMS[teamIndex].name).innerHTML = PLAYERS[playerIndex].name
-
-    TEAMS.splice(teamIndex, 1)
-
-    PLAYERS[playerIndex].teams += 1
-
-    if (PLAYERS[playerIndex].teams >= MAX_TEAMS) {
-      PLAYERS.splice(playerIndex, 1)
-    }
-
-    playerIndex = randomInt(0, PLAYERS.length - 1)
-
-    setNextPlayer()
-
-    // TEMP
-    count = 0
-  }
+const state = {
+  drawInterval: 75,
+  lastTime: 0,
+  playerIndex: randomInt(0, POT_PLAYERS.length - 1),
+  startTime: 0,
+  teamIndex: null,
+  timer: 0,
 }
 
 function drawTeam() {
-  // End of draw!
-  if (!TEAMS.length) {
-    // const plyrs = Object.keys(DRAW).reduce((acc, cur) => {
-    //   if (!acc[DRAW[cur]]) {
-    //     acc[DRAW[cur]] = 0
-    //   }
-    //
-    //   acc[DRAW[cur]] += 1
-    //
-    //   return acc
-    // }, {})
-    //
-    // console.log(plyrs)
-
+  // They think it's all over...
+  if (!POT_TEAMS.length) {
+    // ...it is now
     button.disabled = true
 
     return
   }
 
-  window.requestAnimationFrame(step)
+  // start the draw
+  window.requestAnimationFrame(drawTease)
 }
 
+function drawTease(ts) {
+  // init timer start time
+  if (!state.startTime) state.startTime = ts
+
+  // update timer progress
+  state.timer = ts - state.startTime
+
+  if (state.timer < DRAW_MAX_TIME) {
+    // calculate delta
+    const delta = ts - state.lastTime
+
+    // throttle draw
+    if (delta > state.drawInterval) {
+      // pick a team
+      state.teamIndex = randomInt(0, POT_TEAMS.length - 1)
+
+      // render the team name to the DOM
+      el_team.innerHTML =  POT_TEAMS[state.teamIndex].name
+
+      // update last time
+      state.lastTime = ts
+    }
+
+    // keep guessing
+    return window.requestAnimationFrame(drawTease)
+  } else {
+    // draw the final team!
+    DRAW[POT_TEAMS[state.teamIndex].name] = POT_PLAYERS[state.playerIndex].name
+
+    // render player name against team
+    document.getElementById(POT_TEAMS[state.teamIndex].name).innerHTML = POT_PLAYERS[state.playerIndex].name
+
+    // remove drawn team from pot
+    POT_TEAMS.splice(state.teamIndex, 1)
+
+    // increment player's team count
+    POT_PLAYERS[state.playerIndex].teams += 1
+
+    // remove player from pot if max teams allocated
+    if (POT_PLAYERS[state.playerIndex].teams >= MAX_TEAMS) {
+      POT_PLAYERS.splice(state.playerIndex, 1)
+    }
+
+    // choose next player to draw
+    state.playerIndex = randomInt(0, POT_PLAYERS.length - 1)
+
+    // render next player to DOM
+    setNextPlayer()
+
+    // reset timer
+    state.lastTime = 0
+    state.startTime = 0
+    state.timer = 0
+  }
+}
+
+function easeOutQuad(t) {
+  return t * (2 - t)
+}
+
+// HERE WE GO, HERE WE GO, HERE WE GO 🎵
 function init() {
+  // set the first player to draw
   setNextPlayer()
 }
 
-function setNextPlayer() {
-  el_player.innerHTML = `Up next &rarr; ${PLAYERS[playerIndex].name}`
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }
+
+function setNextPlayer() {
+  el_player.innerHTML = `Up next &rarr; ${POT_PLAYERS[state.playerIndex].name}`
+}
+
+/*
+
+     -   \O                                     ,  .-.___
+   -     /\                                   O/  /xx\XXX\
+  -   __/\ `                                  /\  |xx|XXX|
+     `    \, ()                              ` << |xx|XXX|
+^^^^^^^^`^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ */
