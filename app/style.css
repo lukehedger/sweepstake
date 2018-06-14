@@ -59,6 +59,12 @@ h5 {
   margin-bottom: 0;
 }
 
+img {
+  display: block;
+  margin: 0 auto 32px;
+  width: 150px;
+}
+
 .group {
   margin-right: 64px;
   margin-bottom: 32px;

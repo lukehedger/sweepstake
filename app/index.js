@@ -3,11 +3,19 @@ const el_player = document.getElementById('player')
 const el_team = document.getElementById('team')
 
 const DRAW = {}
-// const DRAW_MAX_TIME = 1000
+const DRAW_INTERVAL = 150
 const DRAW_MAX_TIME = 2000
-const MAX_TEAMS = 4
+const MAX_TEAMS = 3
 
 const POT_PLAYERS = [
+  {
+    name: "Alex",
+    teams: 0,
+  },
+  {
+    name: "Charlotte",
+    teams: 0,
+  },
   {
     name: "Dan",
     teams: 0,
@@ -150,15 +158,14 @@ const POT_TEAMS = [
     name: "England",
     group: "G",
   },
-  {
-    name: "Panama",
-    group: "G",
-  },
-  {
-    name: "Tunisia",
-    group: "G",
-  },
-
+  // {
+  //   name: "Panama",
+  //   group: "G",
+  // },
+  // {
+  //   name: "Tunisia",
+  //   group: "G",
+  // },
   {
     name: "Colombia",
     group: "H",
@@ -178,7 +185,6 @@ const POT_TEAMS = [
 ]
 
 const state = {
-  drawInterval: 75,
   lastTime: 0,
   playerIndex: randomInt(0, POT_PLAYERS.length - 1),
   startTime: 0,
@@ -211,7 +217,7 @@ function drawTease(ts) {
     const delta = ts - state.lastTime
 
     // throttle draw
-    if (delta > state.drawInterval) {
+    if (delta > DRAW_INTERVAL) {
       // pick a team
       state.teamIndex = randomInt(0, POT_TEAMS.length - 1)
 
@@ -253,10 +259,6 @@ function drawTease(ts) {
     state.startTime = 0
     state.timer = 0
   }
-}
-
-function easeOutQuad(t) {
-  return t * (2 - t)
 }
 
 // HERE WE GO, HERE WE GO, HERE WE GO 🎵
