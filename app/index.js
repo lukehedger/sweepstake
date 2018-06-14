@@ -234,6 +234,9 @@ function drawTease(ts) {
     // draw the final team!
     DRAW[POT_TEAMS[state.teamIndex].name] = POT_PLAYERS[state.playerIndex].name
 
+    // store the draw
+    localStorage.setItem('JAAK:draw', JSON.stringify(DRAW))
+
     // render player name against team
     document.getElementById(POT_TEAMS[state.teamIndex].name).innerHTML = POT_PLAYERS[state.playerIndex].name
 
@@ -263,6 +266,9 @@ function drawTease(ts) {
 
 // HERE WE GO, HERE WE GO, HERE WE GO 🎵
 function init() {
+  // clear old draw
+  localStorage.removeItem('JAAK:draw')
+
   // set the first player to draw
   setNextPlayer()
 }
